@@ -1,0 +1,15 @@
+{
+  "block.datquarry.quarry": "Quarry",
+  "block.datquarry.silk": "Silk Touch",
+  "block.datquarry.speedup_16": "Speedup x16",
+  "block.datquarry.speedup_2": "Speedup x2",
+  "block.datquarry.speedup_32": "Speedup x32",
+  "block.datquarry.speedup_4": "Speedup x4",
+  "block.datquarry.speedup_8": "Speedup x8",
+  "item.datquarry.energy-core": "Energy Core",
+  "item.datquarry.quarry-battery": "Quarry Battery",
+  "item.datquarry.quarry-control-unit": "Quarry Control Unit",
+  "item.datquarry.quarry-core": "Quarry Core",
+  "item.datquarry.silk-cloth": "Silk Cloth",
+  "item_group.datquarry.dat-quarry": "DatQuarry"
+}

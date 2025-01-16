@@ -1,6 +1,7 @@
 package dev.vstz.datquarry.world
 
 import dev.vstz.datquarry.world.QuarryWorldGen.MAX_CAPACITY
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import kotlin.random.Random
 
@@ -11,7 +12,7 @@ class QuarryChunk() {
     private val blockStateArray = ArrayList<BlockState>(MAX_CAPACITY)
     private var currentIndex = 0
 
-    init {
+    fun init() {
         // resize array ;)
         for (i in 0 until MAX_CAPACITY) {
             blockStateArray.add(QuarryWorldGen.air)
@@ -32,6 +33,9 @@ class QuarryChunk() {
     }
 
     private fun generateList() {
+        if (!QuarryWorldGen.ready) {
+            return
+        }
         if (random.nextInt(0, 100) < 25 || currentBiome == null) {
             currentBiome = QuarryWorldGen.randomBiome
         }

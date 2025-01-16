@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "i": {
+      "item": "minecraft:gold_ingot"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "s": {
+      "item": "datquarry:speedup_8"
+    }
+  },
+  "pattern": [
+    "iri",
+    "s s",
+    "iri"
+  ],
+  "result": {
+    "id": "datquarry:speedup_16",
+    "count": 1
+  }
+}

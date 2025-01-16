@@ -8,10 +8,14 @@ import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
 import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.neoforge.event.server.ServerStartingEvent
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent
+import net.neoforged.neoforge.event.server.ServerStartedEvent
 import net.neoforged.neoforge.event.server.ServerStoppedEvent
 import net.neoforged.neoforge.registries.NeoForgeRegistries
 import org.apache.logging.log4j.Level
+import java.io.File
+import mekanism.common.world.ResizableOreFeature
+import mekanism.common.world.ResizableOreFeatureConfig
 import kotlin.system.measureTimeMillis
 
 class PossibleBlockMap {
@@ -31,6 +35,10 @@ object QuarryWorldGen {
     private var AIR: BlockState? = null
     private var STONE: BlockState? = null
     private var DEEPSLATE: BlockState? = null
+    private var GLOWSTONE: BlockState? = null
+    private var NETHER_QUARTZ: BlockState? = null
+
+    var ready: Boolean = false
 
     data class PossibleBlock(val block: BlockState, val weight: Float)
 
@@ -49,6 +57,8 @@ object QuarryWorldGen {
                 repeat(weight) { lookupArray.add(blocks.size - 1) }
             }
         }
+
+        val allBlocks: ArrayList<PossibleBlock> get() = blocks
     }
 
     private val possibleBlocks = HashMap<String, BiomePlacement>()
@@ -60,11 +70,18 @@ object QuarryWorldGen {
             val biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME)
             biomeRegistry.holders().forEach { holder -> iterateBiome(holder.registeredName, holder.value()) }
         }
-
-        val d = possibleBlocks.map { block -> block.value.allSize }.sum()
-
+        /*
+        File("block.yaml").printWriter().use { out ->
+            possibleBlocks.forEach { biome ->
+                out.println("${biome.key}:")
+                biome.value.allBlocks.forEach { block ->
+                    out.println("  - name: \"${block.block.block.descriptionId}\"")
+                    out.println("    weight: ${block.weight}")
+                }
+            }
+        }*/
         DatQuarryMod.LOGGER.log(Level.INFO, "Found {} biomes", possibleBlocks.keys.size)
-
+        ready = true
     }
 
     fun onWorldUnload(server: MinecraftServer) {
@@ -84,6 +101,10 @@ object QuarryWorldGen {
                     config.targetStates.forEach {
                         possibleBlocks[name]!!.allSize += possibleBlockMap.add(it.state, config.size)
                     }
+                } else if (config is ResizableOreFeatureConfig) {
+                    config.targetStates.forEach {
+                        possibleBlocks[name]!!.allSize += possibleBlockMap.add(it.state, config.size.asInt)
+                    }
                 }
             }
         }
@@ -91,6 +112,8 @@ object QuarryWorldGen {
             val all = possibleBlocks[name]!!.allSize
             possibleBlocks[name]!!.allSize += possibleBlockMap.add(STONE!!, orMin(all, 0.4, 50))
             possibleBlocks[name]!!.allSize += possibleBlockMap.add(DEEPSLATE!!, orMin(all, 0.1, 20))
+            possibleBlocks[name]!!.allSize += possibleBlockMap.add(GLOWSTONE!!, orMin(all, 0.1, 10))
+            possibleBlocks[name]!!.allSize += possibleBlockMap.add(NETHER_QUARTZ!!, orMin(all, 0.01, 10))
             possibleBlocks[name]!!.fill(possibleBlockMap.data)
         } else {
             possibleBlocks.remove(name)
@@ -108,6 +131,10 @@ object QuarryWorldGen {
         DEEPSLATE =
             blockRegistry.get(ResourceLocation.fromNamespaceAndPath("minecraft", "deepslate"))!!.defaultBlockState()
         AIR = blockRegistry.get(ResourceLocation.fromNamespaceAndPath("minecraft", "air"))!!.defaultBlockState()
+        GLOWSTONE =
+            blockRegistry.get(ResourceLocation.fromNamespaceAndPath("minecraft", "glowstone"))!!.defaultBlockState()
+        NETHER_QUARTZ = blockRegistry.get(ResourceLocation.fromNamespaceAndPath("minecraft", "nether_quartz_ore"))!!
+            .defaultBlockState()
     }
 
     val air: BlockState
@@ -126,17 +153,18 @@ object QuarryWorldGen {
 }
 
 class QuarryWorldEventHandler {
+
     @SubscribeEvent
-    fun onServerStart(event: ServerStartingEvent) {
+    fun onServerAboutToStart(event: ServerAboutToStartEvent) {
         QuarryWorldGen.prepareBlockStates(event.server);
+    }
+
+    @SubscribeEvent
+    fun onServerStart(event: ServerStartedEvent) {
         val timeInMillis = measureTimeMillis {
             QuarryWorldGen.onWorldLoad(event.server)
         }
         DatQuarryMod.LOGGER.log(Level.INFO, "(Generating Possible blocks took $timeInMillis ms)")
-
-        val chunk = QuarryChunk()
-        var next = chunk.nextBlockState
-        next = chunk.nextBlockState
     }
 
     @SubscribeEvent

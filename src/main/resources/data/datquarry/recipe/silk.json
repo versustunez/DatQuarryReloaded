@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "I": {
+      "item": "datquarry:silk-cloth"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "datquarry:quarry-control-unit"
+    }
+  },
+  "pattern": [
+    "IRI",
+    "RSR",
+    "IRI"
+  ],
+  "result": {
+    "id": "datquarry:silk",
+    "count": 1
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": {
+      "item": "minecraft:string"
+    },
+    "g": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "pattern": [
+    "###",
+    "#g#",
+    "###"
+  ],
+  "result": {
+    "id": "datquarry:silk-cloth",
+    "count": 1
+  }
+}

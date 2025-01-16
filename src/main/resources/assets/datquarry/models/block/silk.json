@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "datquarry:block/quarry-side",
+    "side": "datquarry:block/silk",
+    "top": "datquarry:block/quarry-side"
+  }
+}
